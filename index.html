@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Розыгрыш Mercedes</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'Inter', sans-serif;
+    background: #f7f8f7;
+    color: #333;
+  }
+
+  /* --- ЗАГРУЗКА --- */
+  .loader {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    flex-direction: column;
+    background: url('mountains.jpg') center/cover no-repeat;
+    filter: brightness(0.85) blur(3px);
+    z-index: 9999; /* Высокий z-index для покрытия всего */
+  }
+
+  .loader::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,128,0,0.25), rgba(255,255,255,0.5));
+    backdrop-filter: blur(4px);
+    z-index: 1;
+  }
+
+  .loader-text {
+    z-index: 2;
+    color: white;
+    text-align: center;
+    margin-bottom: 80px;
+    font-size: 1.3rem;
+    font-weight: 500;
+    text-shadow: 0 0 15px rgba(0,128,0,0.9);
+    animation: fadeIn 1s ease forwards;
+  }
+
+  .dots::after {
+    content: '';
+    display: inline-block;
+    animation: dots 1.5s steps(4, end) infinite;
+  }
+
+  @keyframes dots {
+    0%, 20% { content: ''; }
+    40% { content: '.'; }
+    60% { content: '..'; }
+    80%, 100% { content: '...'; }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* --- ГЛАВНАЯ СТРАНИЦА --- */
+  .main {
+    display: none;
+    min-height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    position: relative; /* Для позиционирования фона */
+  }
+
+  .car-block {
+    width: 100%;
+    background: #e5e5e5; /* Восстановлен фон для блока с машиной */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 25px 0;
+    z-index: 1; /* Выше фона */
+  }
+
+  .car-block img {
+    width: 90%;
+    max-width: 800px;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+
+  /* --- БИЛЕТЫ --- */
+  .tickets-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 20px 10px 40px;
+    scroll-behavior: smooth;
+    z-index: 1; /* Выше фона */
+  }
+
+  .tickets {
+    display: grid;
+    grid-template-rows: repeat(5, auto);
+    grid-auto-flow: column;
+    gap: 14px;
+    width: max-content;
+  }
+
+  .ticket {
+    width: 120px;
+    height: 70px;
+    background: white;
+    color: #2e8b57;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #2e8b57;
+    position: relative;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .ticket::before,
+  .ticket::after {
+    content: "";
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: #f7f8f7;
+    border: 2px solid #2e8b57;
+    border-radius: 50%;
+    z-index: 2;
+  }
+
+  .ticket::before {
+    top: 50%;
+    left: -9px;
+    transform: translateY(-50%);
+  }
+
+  .ticket::after {
+    top: 50%;
+    right: -9px;
+    transform: translateY(-50%);
+  }
+
+  .ticket:hover {
+    background: #2e8b57;
+    color: white;
+    box-shadow: 0 0 10px rgba(46,139,87,0.5);
+  }
+
+  .ticket.selected {
+    background: #2e8b57;
+    color: white;
+    box-shadow: 0 0 15px rgba(46,139,87,0.8);
+  }
+
+  .tickets-wrapper::-webkit-scrollbar {
+    height: 10px;
+  }
+
+  .tickets-wrapper::-webkit-scrollbar-thumb {
+    background: #2e8b57;
+    border-radius: 5px;
+  }
+
+  /* --- КНОПКИ --- */
+  .buttons {
+    display: flex;
+    justify-content: flex-start;
+    padding: 0 20px 40px;
+    gap: 20px;
+    z-index: 1; /* Выше фона */
+  }
+
+  .btn {
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #000; /* Черный текст */
+    background: transparent; /* Прозрачный фон */
+    border: 2px solid #000; /* Черная обводка */
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Легкая черная подсветка */
+  }
+
+  .btn:hover {
+    background: rgba(0,0,0,0.1); /* Легкая черная подцветка при hover */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transform: translateY(-2px);
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* --- МОДАЛЬНОЕ ОКНО --- */
+  #modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5); /* Полупрозрачный оверлей */
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    animation: fadeInModal 0.3s ease;
+  }
+
+  @keyframes fadeInModal {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  #close-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+    transition: color 0.2s;
+  }
+
+  #close-modal:hover {
+    color: #f00;
+  }
+
+  #modal h2 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    text-align: center;
+    color: #2e8b57;
+  }
+
+  #selected-tickets {
+    margin-bottom: 20px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  #warning {
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: #f00;
+    text-align: center;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 1rem;
+  }
+
+  .checkbox-label input {
+    margin-right: 10px;
+    accent-color: #2e8b57;
+  }
+
+  #abkhazia-label {
+    color: #f00; /* Красный текст для галочки "из Абхазии" */
+  }
+
+  #confirm-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    background: #2e8b57;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(46,139,87,0.3);
+  }
+
+  #confirm-btn:hover {
+    background: #228b22;
+    box-shadow: 0 4px 12px rgba(46,139,87,0.5);
+    transform: translateY(-2px);
+  }
+
+  #confirm-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    background: #2e8b57;
+  }
+
+  /* --- ФУТЕР --- */
+  footer {
+    margin-top: auto;
+    background: linear-gradient(135deg, #333, #555); /* Черно-серый градиент */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1; /* Выше фона */
+  }
+
+  footer a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+
+  footer a:hover {
+    color: #f7f8f7;
+  }
+
+  @media (max-width: 768px) {
+    .ticket {
+      width: 85px;
+      height: 55px;
+      font-size: 0.9rem;
+    }
+    .car-block img {
+      height: 250px;
+    }
+    .btn {
+      padding: 10px 20px;
+      font-size: 0.9rem;
+    }
+    footer {
+      flex-direction: column;
+      gap: 10px;
+    }
+    #modal-content {
+      padding: 20px;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ЗАГРУЗКА -->
+  <div class="loader">
+    <div class="loader-text">Загружаю свободные числа<span class="dots"></span></div>
+  </div>
+
+  <!-- ГЛАВНАЯ -->
+  <div class="main">
+    <div class="car-block">
+      <img src="1.jpg" alt="Mercedes">
+    </div>
+
+    <div class="tickets-wrapper">
+      <div class="tickets" id="tickets"></div>
+    </div>
+
+    <!-- КНОПКИ -->
+    <div class="buttons">
+      <button class="btn" id="buy-btn" disabled>Купить (0 ₽)</button>
+      <button class="btn" id="auto-btn">Авто выбор</button>
+    </div>
+
+    <!-- ФУТЕР -->
+    <footer>
+      <span>Розыгрыш Mercedes</span> |
+      <span>2025</span> |
+      <a href="#">Политика конфиденциальности</a>
+    </footer>
+  </div>
+
+  <!-- МОДАЛЬНОЕ ОКНО -->
+  <div id="modal">
+    <div id="modal-content">
+      <span id="close-modal">&times;</span>
+      <h2>Подтверждение покупки</h2>
+      <div id="selected-tickets"></div>
+      <div id="warning">Билеты могут купить только люди из Абхазии. Если вы не из Абхазии, розыгрыш будет проводиться заново.</div>
+      <label class="checkbox-label" id="abkhazia-label">
+        <input type="checkbox" id="abkhazia-check"> Я из Абхазии
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="policy-check"> Согласен с <a href="#">политикой конфиденциальности</a>
+      </label>
+      <button id="confirm-btn" disabled>Подтвердить</button>
+    </div>
+  </div>
+
+  <script>
+    // Симуляция загрузки
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.querySelector('.loader').style.opacity = '0';
+        setTimeout(() => {
+          document.querySelector('.loader').remove();
+          document.querySelector('.main').style.display = 'flex';
+        }, 600);
+      }, 7000);
+    });
+
+    // Генерация билетов
+    const container = document.getElementById('tickets');
+    const tickets = [];
+    const ticketPrice = 2000;
+    for (let i = 1; i <= 1000; i++) {
+      const ticket = document.createElement('div');
+      ticket.classList.add('ticket');
+      ticket.textContent = i;
+      ticket.dataset.num = i;
+      ticket.addEventListener('click', () => {
+        ticket.classList.toggle('selected');
+        updateBuyButton();
+      });
+      container.appendChild(ticket);
+      tickets.push(ticket);
+    }
+
+    // Обновление кнопки купить
+    function updateBuyButton() {
+      const selectedCount = document.querySelectorAll('.ticket.selected').length;
+      const totalPrice = selectedCount * ticketPrice;
+      const buyBtn = document.getElementById('buy-btn');
+      buyBtn.textContent = `Купить (${totalPrice} ₽)`;
+      buyBtn.disabled = selectedCount === 0;
+    }
+
+    // Авто выбор
+    document.getElementById('auto-btn').addEventListener('click', () => {
+      // Сброс выбранных
+      tickets.forEach(t => t.classList.remove('selected'));
+      // Выбор случайного
+      const randomIndex = Math.floor(Math.random() * tickets.length);
+      tickets[randomIndex].classList.add('selected');
+      // Скролл к выбранному
+      tickets[randomIndex].scrollIntoView({ behavior: 'smooth', inline: 'center' });
+      updateBuyButton();
+    });
+
+    // Модальное окно
+    const modal = document.getElementById('modal');
+    const closeModal = document.getElementById('close-modal');
+    const abkhaziaCheck = document.getElementById('abkhazia-check');
+    const policyCheck = document.getElementById('policy-check');
+    const confirmBtn = document.getElementById('confirm-btn');
+    const selectedTicketsDiv = document.getElementById('selected-tickets');
+
+    // Закрытие модалки
+    closeModal.addEventListener('click', () => {
+      modal.style.display = 'none';
+      resetModal();
+    });
+
+    // Клик вне модалки
+    window.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+        resetModal();
+      }
+    });
+
+    // Открытие модалки при клике на купить
+    document.getElementById('buy-btn').addEventListener('click', () => {
+      const selected = Array.from(document.querySelectorAll('.ticket.selected')).map(t => t.dataset.num);
+      if (selected.length > 0) {
+        selectedTicketsDiv.textContent = `Выбранные билеты: ${selected.join(', ')}`;
+        modal.style.display = 'flex';
+      }
+    });
+
+    // Проверка галочек
+    function checkConfirmButton() {
+      confirmBtn.disabled = !abkhaziaCheck.checked || !policyCheck.checked;
+    }
+
+    abkhaziaCheck.addEventListener('change', checkConfirmButton);
+    policyCheck.addEventListener('change', checkConfirmButton);
+
+    // Подтверждение покупки - перенаправление в Telegram бот
+    confirmBtn.addEventListener('click', () => {
+      const selected = Array.from(document.querySelectorAll('.ticket.selected')).map(t => t.dataset.num);
+      const totalPrice = selected.length * ticketPrice;
+      // Формируем параметр для /start, например: tickets_1,2,3_sum_4000
+      const startParam = `tickets_${selected.join(',')}_sum_${totalPrice}`;
+      // Замените 'yourbotusername' на реальное имя вашего бота
+      window.location.href = `tg://resolve/?domain=Booioooodksisk_bot&start=${encodeURIComponent(startParam)}`;
+      modal.style.display = 'none';
+      resetModal();
+      // Сброс выбранных билетов после (опционально)
+      tickets.forEach(t => t.classList.remove('selected'));
+      updateBuyButton();
+    });
+
+    // Сброс модалки
+    function resetModal() {
+      abkhaziaCheck.checked = false;
+      policyCheck.checked = false;
+      confirmBtn.disabled = true;
+    }
+  </script>
+
+</body>
+</html>
