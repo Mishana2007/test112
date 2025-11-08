@@ -14,64 +14,12 @@
   html, body {
     height: 100%;
     font-family: 'Inter', sans-serif;
-    background: #f7f8f7;
-    color: #333;
-  }
-
-  /* --- ЗАГРУЗКА --- */
-  .loader {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    flex-direction: column;
-    background: url('mountains.jpg') center/cover no-repeat;
-    filter: brightness(0.85) blur(3px);
-    z-index: 9999; /* Высокий z-index для покрытия всего */
-  }
-
-  .loader::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(0,128,0,0.25), rgba(255,255,255,0.5));
-    backdrop-filter: blur(4px);
-    z-index: 1;
-  }
-
-  .loader-text {
-    z-index: 2;
-    color: white;
-    text-align: center;
-    margin-bottom: 80px;
-    font-size: 1.3rem;
-    font-weight: 500;
-    text-shadow: 0 0 15px rgba(0,128,0,0.9);
-    animation: fadeIn 1s ease forwards;
-  }
-
-  .dots::after {
-    content: '';
-    display: inline-block;
-    animation: dots 1.5s steps(4, end) infinite;
-  }
-
-  @keyframes dots {
-    0%, 20% { content: ''; }
-    40% { content: '.'; }
-    60% { content: '..'; }
-    80%, 100% { content: '...'; }
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    background: #0a2342; /* Темно-синий фон, не слишком темный */
+    color: #e0e0e0; /* Светлый текст для контраста на темном фоне */
   }
 
   /* --- ГЛАВНАЯ СТРАНИЦА --- */
   .main {
-    display: none;
     min-height: 100vh;
     overflow-y: auto;
     display: flex;
@@ -81,7 +29,7 @@
 
   .car-block {
     width: 100%;
-    background: #e5e5e5; /* Восстановлен фон для блока с машиной */
+    background: transparent; /* Прозрачный фон для интеграции с общим фоном */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -96,31 +44,33 @@
     height: 400px;
     object-fit: cover;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    border: 4px solid #001533; /* Более темный синий по краям для выделения */
+    box-shadow: 0 0 20px rgba(0, 51, 102, 0.8); /* Подсветка (glow) по краям в синих тонах для красивого вида */
   }
 
   /* --- БИЛЕТЫ --- */
   .tickets-wrapper {
     width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     padding: 20px 10px 40px;
     scroll-behavior: smooth;
+    height: 400px; /* Фиксированная высота для вертикального скролла */
     z-index: 1; /* Выше фона */
   }
 
   .tickets {
     display: grid;
-    grid-template-rows: repeat(5, auto);
-    grid-auto-flow: column;
+    grid-template-columns: repeat(6, auto); /* 6 колонок для вертикального скролла */
+    grid-auto-flow: row;
     gap: 14px;
-    width: max-content;
+    width: 100%;
   }
 
   .ticket {
-    width: 120px;
-    height: 70px;
-    background: white;
+    width: 100px; /* Уменьшенный размер билетов */
+    height: 60px;
+    background: rgba(255, 255, 255, 0.1); /* Полупрозрачный для интеграции с фоном */
     color: #2e8b57;
     font-weight: 600;
     display: flex;
@@ -139,7 +89,7 @@
     position: absolute;
     width: 14px;
     height: 14px;
-    background: #f7f8f7;
+    background: #0a2342; /* Соответствует фону */
     border: 2px solid #2e8b57;
     border-radius: 50%;
     z-index: 2;
@@ -170,7 +120,7 @@
   }
 
   .tickets-wrapper::-webkit-scrollbar {
-    height: 10px;
+    width: 10px; /* Вертикальный скроллбар */
   }
 
   .tickets-wrapper::-webkit-scrollbar-thumb {
@@ -191,18 +141,18 @@
     padding: 12px 24px;
     font-size: 1rem;
     font-weight: 600;
-    color: #000; /* Черный текст */
+    color: #fff; /* Белый текст для контраста */
     background: transparent; /* Прозрачный фон */
-    border: 2px solid #000; /* Черная обводка */
+    border: 2px solid #fff; /* Белая обводка */
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Легкая черная подсветка */
+    box-shadow: 0 2px 8px rgba(255,255,255,0.1); /* Легкая подсветка */
   }
 
   .btn:hover {
-    background: rgba(0,0,0,0.1); /* Легкая черная подцветка при hover */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    background: rgba(255,255,255,0.1); /* Легкая подцветка при hover */
+    box-shadow: 0 4px 12px rgba(255,255,255,0.2);
     transform: translateY(-2px);
   }
 
@@ -225,7 +175,8 @@
   }
 
   #modal-content {
-    background: white;
+    background: #0a2342; /* Соответствует основному фону */
+    color: #e0e0e0; /* Светлый текст */
     padding: 30px;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
@@ -246,7 +197,7 @@
     right: 10px;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #333;
+    color: #e0e0e0;
     transition: color 0.2s;
   }
 
@@ -322,7 +273,7 @@
   /* --- ФУТЕР --- */
   footer {
     margin-top: auto;
-    background: linear-gradient(135deg, #333, #555); /* Черно-серый градиент */
+    background: linear-gradient(135deg, #001533, #0a2342); /* Градиент в синих тонах */
     color: white;
     padding: 20px;
     text-align: center;
@@ -349,8 +300,8 @@
 
   @media (max-width: 768px) {
     .ticket {
-      width: 85px;
-      height: 55px;
+      width: 80px; /* Уменьшенный размер для мобильных */
+      height: 50px;
       font-size: 0.9rem;
     }
     .car-block img {
@@ -367,15 +318,13 @@
     #modal-content {
       padding: 20px;
     }
+    .tickets {
+      grid-template-columns: repeat(5, auto); /* 5 колонок на мобильных для лучшей подгонки */
+    }
   }
 </style>
 </head>
 <body>
-
-  <!-- ЗАГРУЗКА -->
-  <div class="loader">
-    <div class="loader-text">Загружаю свободные числа<span class="dots"></span></div>
-  </div>
 
   <!-- ГЛАВНАЯ -->
   <div class="main">
@@ -419,17 +368,6 @@
   </div>
 
   <script>
-    // Симуляция загрузки
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        document.querySelector('.loader').style.opacity = '0';
-        setTimeout(() => {
-          document.querySelector('.loader').remove();
-          document.querySelector('.main').style.display = 'flex';
-        }, 600);
-      }, 7000);
-    });
-
     // Генерация билетов
     const container = document.getElementById('tickets');
     const tickets = [];
@@ -464,7 +402,7 @@
       const randomIndex = Math.floor(Math.random() * tickets.length);
       tickets[randomIndex].classList.add('selected');
       // Скролл к выбранному
-      tickets[randomIndex].scrollIntoView({ behavior: 'smooth', inline: 'center' });
+      tickets[randomIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       updateBuyButton();
     });
 
