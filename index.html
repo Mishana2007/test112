@@ -14,8 +14,29 @@
   html, body {
     height: 100%;
     font-family: 'Inter', sans-serif;
-    background: #0a2342; /* Темно-синий фон, не слишком темный */
+    background: linear-gradient(to bottom, #0a2342, #001533, #0a2342); /* Мягкий градиент с намеком на грозу (темные тона) */
     color: #e0e0e0; /* Светлый текст для контраста на темном фоне */
+    position: relative;
+  }
+
+  /* Эффект грозы: легкая анимация для "незаметного грома" - вспышки света */
+  body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 70%);
+    opacity: 0;
+    animation: thunderFlash 10s infinite ease-in-out;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes thunderFlash {
+    0%, 90%, 100% { opacity: 0; }
+    95% { opacity: 0.3; } /* Короткая вспышка для эффекта грозы */
   }
 
   /* --- ГЛАВНАЯ СТРАНИЦА --- */
@@ -25,6 +46,7 @@
     display: flex;
     flex-direction: column;
     position: relative; /* Для позиционирования фона */
+    z-index: 1; /* Выше эффекта грозы */
   }
 
   .car-block {
@@ -34,42 +56,50 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 25px 0;
+    padding: 40px 0; /* Больше отступов для премиум вида */
     z-index: 1; /* Выше фона */
   }
 
   .car-block img {
     width: 90%;
     max-width: 800px;
-    height: 400px;
+    height: auto; /* Авто высота для пропорций */
     object-fit: cover;
-    border-radius: 12px;
-    border: 4px solid #001533; /* Более темный синий по краям для выделения */
-    box-shadow: 0 0 20px rgba(0, 51, 102, 0.8); /* Подсветка (glow) по краям в синих тонах для красивого вида */
+    border-radius: 20px; /* Более мягкие углы */
+    border: 8px solid #000d1f; /* Более темный синий для рамки */
+    box-shadow: 
+      0 0 20px rgba(255, 255, 255, 0.8), /* Белая неоновая подсветка */
+      0 0 40px rgba(0, 51, 102, 1), /* Синяя неоновая подсветка */
+      0 0 60px rgba(0, 51, 102, 0.6); /* Дополнительный glow для глубины */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Анимация для интерактивности */
+  }
+
+  .car-block img:hover {
+    transform: scale(1.02); /* Легкое увеличение при hover */
+    box-shadow: 
+      0 0 30px rgba(255, 255, 255, 1), 
+      0 0 50px rgba(0, 51, 102, 1.2), 
+      0 0 80px rgba(0, 51, 102, 0.8);
   }
 
   /* --- БИЛЕТЫ --- */
   .tickets-wrapper {
     width: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
     padding: 20px 10px 40px;
-    scroll-behavior: smooth;
-    height: 400px; /* Фиксированная высота для вертикального скролла */
     z-index: 1; /* Выше фона */
   }
 
   .tickets {
     display: grid;
-    grid-template-columns: repeat(6, auto); /* 6 колонок для вертикального скролла */
-    grid-auto-flow: row;
+    grid-template-columns: repeat(4, auto); /* 4 колонки для десктопа, меньше скролла */
     gap: 14px;
     width: 100%;
+    justify-content: center; /* Центрирование для премиум вида */
   }
 
   .ticket {
-    width: 100px; /* Уменьшенный размер билетов */
-    height: 60px;
+    width: 70px; /* Уменьшенный размер билетов для 4 колонок */
+    height: 45px;
     background: rgba(255, 255, 255, 0.1); /* Полупрозрачный для интеграции с фоном */
     color: #2e8b57;
     font-weight: 600;
@@ -81,15 +111,17 @@
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2); /* Легкая тень для глубины */
+    font-size: 0.9rem; /* Меньший шрифт для компактности */
   }
 
   .ticket::before,
   .ticket::after {
     content: "";
     position: absolute;
-    width: 14px;
-    height: 14px;
-    background: #0a2342; /* Соответствует фону */
+    width: 10px; /* Уменьшенные круги */
+    height: 10px;
+    background: linear-gradient(to bottom, #0a2342, #001533); /* Соответствует фону */
     border: 2px solid #2e8b57;
     border-radius: 50%;
     z-index: 2;
@@ -97,63 +129,56 @@
 
   .ticket::before {
     top: 50%;
-    left: -9px;
+    left: -6px;
     transform: translateY(-50%);
   }
 
   .ticket::after {
     top: 50%;
-    right: -9px;
+    right: -6px;
     transform: translateY(-50%);
   }
 
   .ticket:hover {
     background: #2e8b57;
     color: white;
-    box-shadow: 0 0 10px rgba(46,139,87,0.5);
+    box-shadow: 0 0 15px rgba(46,139,87,0.7); /* Улучшенный hover для вау */
+    transform: scale(1.05); /* Легкое увеличение */
   }
 
   .ticket.selected {
     background: #2e8b57;
     color: white;
-    box-shadow: 0 0 15px rgba(46,139,87,0.8);
-  }
-
-  .tickets-wrapper::-webkit-scrollbar {
-    width: 10px; /* Вертикальный скроллбар */
-  }
-
-  .tickets-wrapper::-webkit-scrollbar-thumb {
-    background: #2e8b57;
-    border-radius: 5px;
+    box-shadow: 0 0 20px rgba(46,139,87,1);
+    transform: scale(1.05);
   }
 
   /* --- КНОПКИ --- */
   .buttons {
     display: flex;
-    justify-content: flex-start;
+    justify-content: center; /* Центрирование для премиум */
     padding: 0 20px 40px;
     gap: 20px;
     z-index: 1; /* Выше фона */
   }
 
   .btn {
-    padding: 12px 24px;
-    font-size: 1rem;
+    padding: 14px 28px; /* Больше для премиум */
+    font-size: 1.1rem;
     font-weight: 600;
     color: #fff; /* Белый текст для контраста */
     background: transparent; /* Прозрачный фон */
     border: 2px solid #fff; /* Белая обводка */
-    border-radius: 8px;
+    border-radius: 10px; /* Мягче */
     cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(255,255,255,0.1); /* Легкая подсветка */
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(255,255,255,0.2); /* Подсветка */
   }
 
   .btn:hover {
-    background: rgba(255,255,255,0.1); /* Легкая подцветка при hover */
-    box-shadow: 0 4px 12px rgba(255,255,255,0.2);
-    transform: translateY(-2px);
+    background: rgba(255,255,255,0.15); /* Легкая подцветка при hover */
+    box-shadow: 0 6px 16px rgba(255,255,255,0.3);
+    transform: translateY(-3px);
   }
 
   .btn:disabled {
@@ -168,34 +193,34 @@
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.5); /* Полупрозрачный оверлей */
+    background: rgba(0,0,0,0.6); /* Темнее оверлей */
     z-index: 10000;
     justify-content: center;
     align-items: center;
   }
 
   #modal-content {
-    background: #0a2342; /* Соответствует основному фону */
+    background: linear-gradient(to bottom, #0a2342, #001533); /* Градиент для модалки */
     color: #e0e0e0; /* Светлый текст */
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    padding: 40px; /* Больше padding */
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
     max-width: 500px;
     width: 90%;
     position: relative;
-    animation: fadeInModal 0.3s ease;
+    animation: fadeInModal 0.4s ease;
   }
 
   @keyframes fadeInModal {
-    from { opacity: 0; transform: scale(0.9); }
+    from { opacity: 0; transform: scale(0.95); }
     to { opacity: 1; transform: scale(1); }
   }
 
   #close-modal {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 1.5rem;
+    top: 15px;
+    right: 15px;
+    font-size: 1.8rem;
     cursor: pointer;
     color: #e0e0e0;
     transition: color 0.2s;
@@ -206,21 +231,21 @@
   }
 
   #modal h2 {
-    font-size: 1.5rem;
-    margin-bottom: 15px;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
     text-align: center;
     color: #2e8b57;
   }
 
   #selected-tickets {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     font-weight: 600;
     text-align: center;
   }
 
   #warning {
-    margin-bottom: 20px;
-    font-size: 0.9rem;
+    margin-bottom: 25px;
+    font-size: 1rem;
     color: #f00;
     text-align: center;
   }
@@ -228,13 +253,15 @@
   .checkbox-label {
     display: flex;
     align-items: center;
-    margin-bottom: 15px;
-    font-size: 1rem;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
   }
 
   .checkbox-label input {
-    margin-right: 10px;
+    margin-right: 12px;
     accent-color: #2e8b57;
+    width: 20px;
+    height: 20px;
   }
 
   #abkhazia-label {
@@ -244,22 +271,22 @@
   #confirm-btn {
     display: block;
     width: 100%;
-    padding: 12px;
-    font-size: 1rem;
+    padding: 14px;
+    font-size: 1.1rem;
     font-weight: 600;
     color: white;
     background: #2e8b57;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(46,139,87,0.3);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(46,139,87,0.4);
   }
 
   #confirm-btn:hover {
     background: #228b22;
-    box-shadow: 0 4px 12px rgba(46,139,87,0.5);
-    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(46,139,87,0.6);
+    transform: translateY(-3px);
   }
 
   #confirm-btn:disabled {
@@ -275,15 +302,15 @@
     margin-top: auto;
     background: linear-gradient(135deg, #001533, #0a2342); /* Градиент в синих тонах */
     color: white;
-    padding: 20px;
+    padding: 25px;
     text-align: center;
-    font-size: 0.9rem;
+    font-size: 1rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
     flex-wrap: wrap;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
     z-index: 1; /* Выше фона */
   }
 
@@ -299,27 +326,30 @@
   }
 
   @media (max-width: 768px) {
+    .tickets {
+      grid-template-columns: repeat(5, auto); /* Больше колонок (5) на мобильных для меньше скролла */
+    }
     .ticket {
-      width: 80px; /* Уменьшенный размер для мобильных */
-      height: 50px;
-      font-size: 0.9rem;
+      width: 60px; /* Еще меньше на мобильных */
+      height: 40px;
+      font-size: 0.8rem;
+    }
+    .car-block {
+      padding: 20px 0;
     }
     .car-block img {
-      height: 250px;
+      width: 95%;
     }
     .btn {
       padding: 10px 20px;
-      font-size: 0.9rem;
+      font-size: 1rem;
     }
     footer {
       flex-direction: column;
       gap: 10px;
     }
     #modal-content {
-      padding: 20px;
-    }
-    .tickets {
-      grid-template-columns: repeat(5, auto); /* 5 колонок на мобильных для лучшей подгонки */
+      padding: 30px;
     }
   }
 </style>
