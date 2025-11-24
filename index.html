@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Розыгрыш Mercedes</title>
 <style>
-  /* Стили остаются без изменений */
   * {
     margin: 0;
     padding: 0;
@@ -55,7 +54,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 0; /* Убираем padding так как он теперь в контейнере */
+      padding: 0;
       z-index: 1;
       position: relative;
   }
@@ -163,7 +162,7 @@
 
   .step-img {
     width: 100%;
-    max-width: 200px; /* Уменьшили размер для ПК, чтобы не вылезало */
+    max-width: 200px;
     height: auto;
     border-radius: 15px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -176,7 +175,7 @@
 
   @media (max-width: 768px) {
     .step-img {
-      max-width: 80%; /* На мобильном - шире, но не вылезает */
+      max-width: 80%;
     }
   }
 
@@ -192,8 +191,8 @@
 
   #search-input {
     width: 80%;
-    max-width: 600px; /* Увеличили длину на ПК */
-    padding: 12px 40px 12px 20px; /* Пространство для иконки */
+    max-width: 600px;
+    padding: 12px 40px 12px 20px;
     font-size: 1rem;
     border: 2px solid #2e8b57;
     border-radius: 25px;
@@ -240,21 +239,22 @@
 
   .tickets-wrapper {
       width: 100%;
-      padding: 30px 0 0; /* Отступ сверху между машиной и билетами */
+      padding: 30px 0 100px;
       z-index: 1;
-      background: transparent; /* Убираем отдельный фон */
+      background: transparent;
+      position: relative;
   }
 
   .tickets {
       display: grid;
-      grid-template-columns: repeat(10, auto); /* 10 колонок вместо 6 */
-      gap: 10px; /* Уменьшил gap для компактности */
+      grid-template-columns: repeat(10, auto);
+      gap: 10px;
       width: 100%;
       justify-content: center;
   }
 
   .ticket {
-      width: 60px; /* Немного уменьшил размер */
+      width: 60px;
       height: 40px;
       background: rgba(255, 255, 255, 0.1);
       color: #2e8b57;
@@ -268,7 +268,7 @@
       cursor: pointer;
       transition: all 0.2s ease;
       box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      font-size: 0.8rem; /* Уменьшил шрифт */
+      font-size: 0.8rem;
   }
 
   .ticket::before,
@@ -310,14 +310,14 @@
   }
 
   .ticket.found {
-    background: #ffd700; /* Желтый цвет для найденного */
+    background: #ffd700;
     color: #000;
     border-color: #ffd700;
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
   }
 
   .ticket.found.selected {
-    background: #2e8b57; /* Зеленый при выборе перекрывает желтый */
+    background: #2e8b57;
     color: white;
     border-color: #2e8b57;
   }
@@ -351,17 +351,24 @@
     gap: 20px;
     z-index: 100;
     padding: 15px 25px;
-    background: rgba(0, 21, 51, 0.85);
-    backdrop-filter: blur(10px);
+    background: rgba(0, 21, 51, 0.95);
+    backdrop-filter: blur(15px);
     border-radius: 15px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(46, 139, 87, 0.3);
-    border: 1px solid rgba(46, 139, 87, 0.2);
-    transition: all 0.3s ease;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(46, 139, 87, 0.4);
+    border: 1px solid rgba(46, 139, 87, 0.3);
+    transition: all 0.4s ease;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .floating-buttons.visible {
+    opacity: 1;
+    visibility: visible;
   }
 
   .floating-buttons:hover {
-    background: rgba(0, 21, 51, 0.95);
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(46, 139, 87, 0.5);
+    background: rgba(0, 21, 51, 0.98);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(46, 139, 87, 0.6);
   }
 
   .floating-btn {
@@ -375,6 +382,9 @@
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .floating-btn:hover {
@@ -522,10 +532,6 @@
     gap: 10px;
   }
 
-  .info-block h3::before {
-    font-size: 1.5rem;
-  }
-
   .info-block p {
     line-height: 1.6;
     margin-bottom: 10px;
@@ -670,24 +676,6 @@
     text-align: center;
   }
 
-  .checkbox-label {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-    font-size: 1.1rem;
-  }
-
-  .checkbox-label input {
-    margin-right: 12px;
-    accent-color: #2e8b57;
-    width: 20px;
-    height: 20px;
-  }
-
-  #abkhazia-label {
-    color: #f00;
-  }
-
   #confirm-btn {
     display: block;
     width: 100%;
@@ -707,14 +695,6 @@
     background: #228b22;
     box-shadow: 0 6px 16px rgba(46,139,87,0.6);
     transform: translateY(-3px);
-  }
-
-  #confirm-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-    background: #2e8b57;
   }
 
   footer {
@@ -891,7 +871,7 @@
   </div>
 
   <!-- ПЛАВАЮЩИЕ КНОПКИ -->
-  <div class="floating-buttons">
+  <div class="floating-buttons" id="floating-buttons">
     <button class="floating-btn" id="floating-auto-btn">🎲 Авто выбор</button>
     <button class="floating-btn" id="floating-buy-btn" disabled>🛒 Купить (0 ₽)</button>
   </div>
@@ -1020,7 +1000,7 @@
 
     // Авто выбор
     document.getElementById('floating-auto-btn').addEventListener('click', (e) => {
-      e.preventDefault(); // Предотвращаем перезагрузку страницы
+      e.preventDefault();
       tickets.forEach(t => t.classList.remove('selected'));
       const available = tickets.filter(t => !t.classList.contains('sold'));
       if (available.length === 0) return;
@@ -1086,7 +1066,7 @@
       const totalPrice = selected.length * ticketPrice;
       
       // ФИКС: Используем более короткий формат для избежания ограничений длины URL
-      const ticketsParam = selected.join('-'); // Используем дефисы вместо запятых
+      const ticketsParam = selected.join('-');
       const startParam = `t${ticketsParam}_s${totalPrice}`;
       
       console.log('Отправляем в Telegram:', startParam);
@@ -1100,7 +1080,6 @@
       // Фолбэк: если не получилось открыть Telegram, показываем инструкцию
       setTimeout(() => {
         if (!document.hidden) {
-          // Если страница все еще видна, значит Telegram не открылся
           alert('Telegram не открылся автоматически. Пожалуйста, перейдите в бот @IRAKLIDAVA_CARS_BOT вручную и отправьте ему команду /start');
         }
       }, 1000);
@@ -1109,6 +1088,28 @@
       tickets.forEach(t => t.classList.remove('selected'));
       updateBuyButton();
     });
+
+    // Показываем плавающие кнопки при прокрутке до билетов
+    const floatingButtons = document.getElementById('floating-buttons');
+    const ticketsWrapper = document.querySelector('.tickets-wrapper');
+
+    function checkScroll() {
+      const ticketsRect = ticketsWrapper.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      
+      // Показываем кнопки когда пользователь прокрутил до билетов
+      if (ticketsRect.top < windowHeight * 0.7) {
+        floatingButtons.classList.add('visible');
+      } else {
+        floatingButtons.classList.remove('visible');
+      }
+    }
+
+    window.addEventListener('scroll', checkScroll);
+    window.addEventListener('resize', checkScroll);
+    
+    // Проверяем начальную позицию
+    setTimeout(checkScroll, 100);
   </script>
 
 </body>
