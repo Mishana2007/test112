@@ -289,7 +289,7 @@
 
   .tickets-wrapper {
       width: 100%;
-      padding: 30px 0 150px; /* Увеличил отступ снизу для лучшего появления кнопок */
+      padding: 30px 0 150px;
       z-index: 1;
       background: transparent;
       position: relative;
@@ -391,7 +391,7 @@
     box-shadow: none;
   }
 
-  /* Плавающие кнопки */
+  /* Плавающие кнопки - ВСЕГДА ВИДИМЫЕ */
   .floating-buttons {
     position: fixed;
     bottom: 30px;
@@ -407,15 +407,8 @@
     box-shadow: 0 10px 35px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(46, 139, 87, 0.4);
     border: 1px solid rgba(46, 139, 87, 0.3);
     transition: all 0.4s ease;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(-50%) translateY(20px);
-  }
-
-  .floating-buttons.visible {
     opacity: 1;
     visibility: visible;
-    transform: translateX(-50%) translateY(0);
   }
 
   .floating-buttons:hover {
@@ -1002,7 +995,7 @@
     </footer>
   </div>
 
-  <!-- ПЛАВАЮЩИЕ КНОПКИ -->
+  <!-- ПЛАВАЮЩИЕ КНОПКИ - ВСЕГДА ВИДИМЫЕ -->
   <div class="floating-buttons" id="floating-buttons">
     <button class="floating-btn" id="floating-auto-btn">🎲 Авто выбор</button>
     <button class="floating-btn" id="floating-buy-btn" disabled>🛒 Купить (0 ₽)</button>
@@ -1308,29 +1301,6 @@
       tickets.forEach(t => t.classList.remove('selected'));
       updateBuyButton();
     });
-
-    // Показываем плавающие кнопки при прокрутке до билетов
-    const floatingButtons = document.getElementById('floating-buttons');
-    const ticketsWrapper = document.querySelector('.tickets-wrapper');
-
-    function checkScroll() {
-      const ticketsRect = ticketsWrapper.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      
-      // Показываем кнопки только когда пользователь прокрутил достаточно далеко вниз
-      // Теперь кнопки появятся когда пользователь увидит примерно 30% билетов
-      if (ticketsRect.top < windowHeight * 0.3) {
-        floatingButtons.classList.add('visible');
-      } else {
-        floatingButtons.classList.remove('visible');
-      }
-    }
-
-    window.addEventListener('scroll', checkScroll);
-    window.addEventListener('resize', checkScroll);
-    
-    // Проверяем начальную позицию
-    setTimeout(checkScroll, 100);
 
     // Оптимизация загрузки изображений
     document.addEventListener('DOMContentLoaded', function() {
