@@ -90,12 +90,10 @@
     width: 100%;
     height: auto;
     display: block;
-    /* Оптимизация загрузки изображений */
     loading: lazy;
     decoding: async;
   }
 
-  /* Плейсхолдер для изображений */
   .carousel-item {
     background: linear-gradient(45deg, #0a2342 25%, #001533 50%, #0a2342 75%);
     background-size: 400% 400%;
@@ -214,7 +212,6 @@
     border-radius: 15px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     transition: transform 0.3s ease;
-    /* Оптимизация загрузки изображений */
     loading: lazy;
     decoding: async;
   }
@@ -287,9 +284,74 @@
     }
   }
 
+  /* Блоки статистики */
+  .stats-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px 0;
+    z-index: 1;
+  }
+
+  .stats-container {
+    display: flex;
+    gap: 20px;
+    max-width: 800px;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .stat-block {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(46, 139, 87, 0.3);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    backdrop-filter: blur(10px);
+  }
+
+  .stat-block:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    border-color: rgba(46, 139, 87, 0.6);
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2e8b57;
+    margin-bottom: 8px;
+    text-shadow: 0 0 10px rgba(46,139,87,0.5);
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+    color: #e0e0e0;
+    opacity: 0.8;
+  }
+
+  @media (max-width: 768px) {
+    .stats-container {
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .stat-block {
+      padding: 15px;
+    }
+    
+    .stat-value {
+      font-size: 1.5rem;
+    }
+  }
+
   .tickets-wrapper {
       width: 100%;
-      padding: 30px 0 150px;
+      padding: 20px 0 150px;
       z-index: 1;
       background: transparent;
       position: relative;
@@ -460,15 +522,21 @@
 
   @media (max-width: 768px) {
     .floating-buttons {
-      flex-direction: column;
-      width: 90%;
-      max-width: 300px;
+      flex-direction: row;
+      width: 95%;
+      max-width: 350px;
       bottom: 20px;
+      padding: 12px 20px;
     }
     
     .floating-btn {
-      padding: 12px 20px;
-      font-size: 1rem;
+      padding: 10px 16px;
+      font-size: 0.9rem;
+      gap: 6px;
+    }
+    
+    .floating-btn span {
+      display: none;
     }
   }
 
@@ -982,6 +1050,24 @@
             <button id="search-btn">🔍</button>
         </div>
 
+        <!-- Блоки статистики -->
+        <div class="stats-wrapper">
+            <div class="stats-container">
+                <div class="stat-block">
+                    <div class="stat-value" id="available-tickets">967</div>
+                    <div class="stat-label">Свободных билетов</div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-value" id="sold-tickets">33</div>
+                    <div class="stat-label">Продано билетов</div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-value">2 000 ₽</div>
+                    <div class="stat-label">Цена билета</div>
+                </div>
+            </div>
+        </div>
+
         <div class="tickets-wrapper">
             <div class="tickets" id="tickets"></div>
         </div>
@@ -997,8 +1083,8 @@
 
   <!-- ПЛАВАЮЩИЕ КНОПКИ - ВСЕГДА ВИДИМЫЕ -->
   <div class="floating-buttons" id="floating-buttons">
-    <button class="floating-btn" id="floating-auto-btn">🎲 Авто выбор</button>
-    <button class="floating-btn" id="floating-buy-btn" disabled>🛒 Купить (0 ₽)</button>
+    <button class="floating-btn" id="floating-auto-btn">🎲<span> Авто выбор</span></button>
+    <button class="floating-btn" id="floating-buy-btn" disabled>🛒<span> Купить (0 ₽)</span></button>
   </div>
 
   <!-- МОДАЛЬНОЕ ОКНО ПОДРОБНОЙ ИНФОРМАЦИИ -->
@@ -1163,15 +1249,25 @@
       });
     });
 
-    // Генерация билетов
+    // Генерация билетов и статистики
     const container = document.getElementById('tickets');
     const tickets = [];
     const ticketPrice = 2000;
+    let soldTicketsCount = 0;
+
     for (let i = 1; i <= 1000; i++) {
       const ticket = document.createElement('div');
       ticket.classList.add('ticket');
       ticket.textContent = i;
       ticket.dataset.num = i;
+      
+      // Случайно помечаем некоторые билеты как проданные для демонстрации
+      const isSold = Math.random() < 0.03; // 3% билетов продано
+      if (isSold) {
+        ticket.classList.add('sold');
+        soldTicketsCount++;
+      }
+      
       ticket.addEventListener('click', () => {
         if (ticket.classList.contains('sold')) return;
         ticket.classList.toggle('selected');
@@ -1181,29 +1277,25 @@
       tickets.push(ticket);
     }
 
-    // Загрузка sold из API
-    async function loadSoldTickets() {
-      try {
-        const res = await fetch('/api/tickets/sold');
-        const soldNums = await res.json();
-        const soldSet = new Set(soldNums);
-        tickets.forEach(t => {
-          if (soldSet.has(parseInt(t.dataset.num))) {
-            t.classList.add('sold');
-          }
-        });
-      } catch (err) {
-        console.error('Ошибка API:', err);
-      }
+    // Обновление статистики
+    function updateStats() {
+      const availableTicketsElement = document.getElementById('available-tickets');
+      const soldTicketsElement = document.getElementById('sold-tickets');
+      
+      const availableTickets = 1000 - soldTicketsCount;
+      availableTicketsElement.textContent = availableTickets;
+      soldTicketsElement.textContent = soldTicketsCount;
     }
-    loadSoldTickets();
+
+    // Инициализация статистики
+    updateStats();
 
     // Обновление кнопки купить
     function updateBuyButton() {
       const selectedCount = document.querySelectorAll('.ticket.selected').length;
       const totalPrice = selectedCount * ticketPrice;
       const floatingBuyBtn = document.getElementById('floating-buy-btn');
-      floatingBuyBtn.textContent = `🛒 Купить (${totalPrice} ₽)`;
+      floatingBuyBtn.innerHTML = `🛒<span> Купить (${totalPrice} ₽)</span>`;
       floatingBuyBtn.disabled = selectedCount === 0;
     }
 
