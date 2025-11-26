@@ -90,6 +90,22 @@
     width: 100%;
     height: auto;
     display: block;
+    /* Оптимизация загрузки изображений */
+    loading: lazy;
+    decoding: async;
+  }
+
+  /* Плейсхолдер для изображений */
+  .carousel-item {
+    background: linear-gradient(45deg, #0a2342 25%, #001533 50%, #0a2342 75%);
+    background-size: 400% 400%;
+    animation: shimmer 2s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
 
   .carousel-controls {
@@ -198,6 +214,9 @@
     border-radius: 15px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     transition: transform 0.3s ease;
+    /* Оптимизация загрузки изображений */
+    loading: lazy;
+    decoding: async;
   }
 
   .step-img:hover {
@@ -270,7 +289,7 @@
 
   .tickets-wrapper {
       width: 100%;
-      padding: 30px 0 100px;
+      padding: 30px 0 150px; /* Увеличил отступ снизу для лучшего появления кнопок */
       z-index: 1;
       background: transparent;
       position: relative;
@@ -390,11 +409,13 @@
     transition: all 0.4s ease;
     opacity: 0;
     visibility: hidden;
+    transform: translateX(-50%) translateY(20px);
   }
 
   .floating-buttons.visible {
     opacity: 1;
     visibility: visible;
+    transform: translateX(-50%) translateY(0);
   }
 
   .floating-buttons:hover {
@@ -930,16 +951,16 @@
             <div class="carousel">
                 <div class="carousel-inner">
                     <div class="carousel-item">
-                        <img src="IMG_6567.PNG" alt="Mercedes">
+                        <img src="IMG_6567.PNG" alt="Mercedes" loading="lazy" decoding="async">
                     </div>
                     <div class="carousel-item">
-                        <img src="IMG_2019.JPG" alt="Mercedes вид сбоку">
+                        <img src="IMG_2019.JPG" alt="Mercedes вид сбоку" loading="lazy" decoding="async">
                     </div>
                     <div class="carousel-item">
-                        <img src="IMG_2047.JPG" alt="Mercedes интерьер">
+                        <img src="IMG_2047.JPG" alt="Mercedes интерьер" loading="lazy" decoding="async">
                     </div>
                     <div class="carousel-item">
-                        <img src="IMG_2080.JPG" alt="Mercedes двигатель">
+                        <img src="IMG_2080.JPG" alt="Mercedes двигатель" loading="lazy" decoding="async">
                     </div>
                 </div>
                 <button class="carousel-arrow prev">&#10094;</button>
@@ -958,9 +979,9 @@
         </div>
 
         <div class="steps-wrapper">
-            <img class="step-img" src="step1.png" alt="Step 1">
-            <img class="step-img" src="step2.png" alt="Step 2">
-            <img class="step-img" src="step3.png" alt="Step 3">
+            <img class="step-img" src="step1.png" alt="Step 1" loading="lazy" decoding="async">
+            <img class="step-img" src="step2.png" alt="Step 2" loading="lazy" decoding="async">
+            <img class="step-img" src="step3.png" alt="Step 3" loading="lazy" decoding="async">
         </div>
 
         <div class="search-wrapper">
@@ -1296,8 +1317,9 @@
       const ticketsRect = ticketsWrapper.getBoundingClientRect();
       const windowHeight = window.innerHeight;
       
-      // Показываем кнопки когда пользователь прокрутил до билетов
-      if (ticketsRect.top < windowHeight * 0.7) {
+      // Показываем кнопки только когда пользователь прокрутил достаточно далеко вниз
+      // Теперь кнопки появятся когда пользователь увидит примерно 30% билетов
+      if (ticketsRect.top < windowHeight * 0.3) {
         floatingButtons.classList.add('visible');
       } else {
         floatingButtons.classList.remove('visible');
@@ -1309,6 +1331,35 @@
     
     // Проверяем начальную позицию
     setTimeout(checkScroll, 100);
+
+    // Оптимизация загрузки изображений
+    document.addEventListener('DOMContentLoaded', function() {
+      // Предзагрузка критически важных изображений
+      const criticalImages = [
+        'IMG_6567.PNG',
+        'step1.png'
+      ];
+      
+      criticalImages.forEach(src => {
+        const img = new Image();
+        img.src = src;
+      });
+
+      // Ленивая загрузка для остальных изображений
+      const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+      
+      const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target;
+            img.src = img.getAttribute('src');
+            imageObserver.unobserve(img);
+          }
+        });
+      });
+
+      lazyImages.forEach(img => imageObserver.observe(img));
+    });
   </script>
 
 </body>
